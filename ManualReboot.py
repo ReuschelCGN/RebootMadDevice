@@ -5,7 +5,7 @@
 #
 __author__ = "GhostTalker"
 __copyright__ = "Copyright 2022, The GhostTalker project"
-__version__ = "3.0.2"
+__version__ = "3.1.1"
 __status__ = "TEST"
 
 # generic/built-in and other libs
@@ -264,6 +264,3 @@ if __name__ == '__main__':
 
     print('Origin to reboot is', DEVICE_ORIGIN_TO_REBOOT)
     rmdItem.doRebootDevice(DEVICE_ORIGIN_TO_REBOOT)
-    
-
-
