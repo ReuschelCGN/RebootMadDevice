@@ -1,5 +1,4 @@
 ConfigParser==5.2.0
-requests==2.27.1
 certifi==2021.10.8
 charset-normalizer==2.0.12
 gevent==21.12.0
