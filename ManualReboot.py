@@ -16,6 +16,7 @@ import subprocess
 import sys
 import getopt
 import time
+import json
 import requests
 
 # check syntax and arguments
