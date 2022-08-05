@@ -1,3 +1,27 @@
+{
+   "ATV01":{
+      "IP_ADDRESS":"192.168.0.1",
+      "SWITCH_MODE":"HTML",
+      "SWITCH_OPTION":"",
+      "SWITCH_VALUE":"https://on_url;https://off_url",
+      "LED_POSITION":"1"
+   },
+   "ATV02":{
+      "IP_ADDRESS":"192.168.0.2",
+      "SWITCH_MODE":"GPIO",
+      "SWITCH_OPTION":"NC;False",
+      "SWITCH_VALUE":"15",
+      "LED_POSITION":"2"
+   },
+   "ATV03":{
+      "IP_ADDRESS":"192.168.0.3",
+      "SWITCH_MODE":"GPIO",
+      "SWITCH_OPTION":"NO;False",
+      "SWITCH_VALUE":"16",
+      "LED_POSITION":"3"
+   },
+   "ATV04":{
+      "IP_ADDRESS":"192.168.0.4",
       "SWITCH_MODE":"GPIO",
       "SWITCH_OPTION":"NC;True",
       "SWITCH_VALUE":"17",
