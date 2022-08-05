@@ -64,9 +64,9 @@ class rmdItem(object):
 
     def __init__(self):
         self.createConnectionPool()  
-        self.initRMDdata()		
+        self.initRMDdata()
 
-    
+
     def createConnectionPool(self):
         ## create connection pool and connect to MySQL
         try:
@@ -78,44 +78,44 @@ class rmdItem(object):
                                                           database=self._mysqldb,
                                                           user=self._mysqluser,
                                                           password=self._mysqlpass)
-        
+
 
             logging.info("Create connection pool: ")
             logging.debug("Connection Pool Name - " + str(self.connection_pool.pool_name))
             logging.debug("Connection Pool Size - " + str(self.connection_pool.pool_size))
-        
+
             # Get connection object from a pool
             connection_object = self.connection_pool.get_connection()
-        
+
             if connection_object.is_connected():
                 db_Info = connection_object.get_server_info()
                 logging.debug("Connected to MySQL database using connection pool ... MySQL Server version on " + db_Info)
-        
+
                 cursor = connection_object.cursor()
                 cursor.execute("select database();")
                 record = cursor.fetchone()
                 logging.info("Your connected to database " + str(record))
-        
+
         except Error as e:
             logging.error("Error while connecting to MySQL using Connection pool: " + e)
-        
+
         finally:
             # closing database connection.
             if connection_object.is_connected():
                 cursor.close()
                 connection_object.close()
                 logging.debug("MySQL connection is closed")
-    
-    
+
+
     def initRMDdata(self):
         # init dict 
         self._rmd_data = {}
-    
+
         # read json file
         logging.debug("Read data from devices.json file.")
         with open('devices.json') as json_file:
            _jsondata = json.load(json_file) 
-    
+
         # init rmd data in dict
         logging.debug("Init rmd data dictonary.")
         for device in _jsondata:
@@ -135,8 +135,8 @@ class rmdItem(object):
                                 'reboot_type': None,
                                 'reboot_forced': False,
                                 'webhook_id': None}
-    	
-    
+
+
     def getDeviceStatusData(self):
         # get device status data
 
@@ -156,7 +156,7 @@ class rmdItem(object):
         try:
             logging.debug("Get db connection from connection pool.")
             connection_object = self.connection_pool.get_connection()
-        
+
             # Get connection object from a pool
             if connection_object.is_connected():
                 logging.debug("MySQL pool connection is open.")
@@ -188,7 +188,7 @@ class rmdItem(object):
 
         except Exception as e:
             logging.error("Error get connection from Connection pool ", e)
-        
+
         finally:
             # closing database connection.
             if connection_object.is_connected():
@@ -297,7 +297,7 @@ class rmdItem(object):
                 logging.info("IP is not banned by PTC, continuing...")
                 banned = False
                 wh_send = False
-        
+
         banned = True
         wh_send = False
         while banned: 
@@ -332,8 +332,8 @@ class rmdItem(object):
                 logging.info("IP is not banned by MAD, continuing...")
                 banned = False
                 wh_send = False
-    
-    
+
+
     def discord_message(self, device_origin, fixed=False):
         # create data for webhook
         logging.info('Start Webhook for device ' + device_origin )
@@ -522,7 +522,7 @@ class rmdItem(object):
         self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_forced'] = True
         self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_type'] = powerSwitchMode
 
-        ## HTML 
+        ## HTML
         if powerSwitchMode == 'HTML':
             logging.debug("PowerSwitch with HTML starting.")
             poweron = powerSwitchValue.split(";")[0]
@@ -535,7 +535,7 @@ class rmdItem(object):
             logging.debug("PowerSwitch with HTML done.")
             return        
 
-        ## GPIO 
+        ## GPIO
         elif powerSwitchMode == 'GPIO':
             logging.debug("PowerSwitch with GPIO starting.")
             relay_mode = powerSwitchOption.split(";")[0]
@@ -596,7 +596,7 @@ class rmdItem(object):
             logging.debug("PowerSwitch with GPIO done.")
             return
 
-        ## CMD 
+        ## CMD
         elif powerSwitchMode == 'CMD':
             logging.debug("PowerSwitch with CMD starting.")
             try:
@@ -609,7 +609,7 @@ class rmdItem(object):
             self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_type'] = "CMD"
             return
 
-        ## SCRIPT 
+        ## SCRIPT
         elif powerSwitchMode == 'SCRIPT':
             logging.debug("PowerSwitch with SCRIPT starting.")
             poweron = powerSwitchValue.split(";")[0]
@@ -628,7 +628,7 @@ class rmdItem(object):
             logging.debug("PowerSwitch with SCRIPT done.")
             return
 
-        ## POE 
+        ## POE
         elif powerSwitchMode == 'POE':
             logging.debug("PowerSwitch with POE starting.")
             try:
@@ -659,7 +659,7 @@ class rmdItem(object):
                 logging.error("failed send command to PowerBoard")
             logging.debug("PowerSwitch with PB done.")
             return
-			
+
         ## SNMP
         elif powerSwitchMode == 'SNMP':
             logging.debug("PowerSwitch with SNMP starting.")
@@ -703,7 +703,6 @@ def create_stdout_log():
 
 
 if __name__ == '__main__':
-
     # Logging Options
     logconfig = configparser.ConfigParser()
     logrootdir = os.path.dirname(os.path.abspath('config.ini'))
@@ -720,7 +719,7 @@ if __name__ == '__main__':
 
     ## init rmdItem
     rmdItem = rmdItem()
-		
+
     # GPIO import libs
     if eval(rmdItem._gpio_usage):
         logging.debug("import GPIO libs")
@@ -728,7 +727,7 @@ if __name__ == '__main__':
 
     # LED initalize / import libs
     if eval(rmdItem._led_enable):
-        logging.debug("LED feature activated")        
+        logging.debug("LED feature activated")
         if rmdItem._led_type == "internal":
             logging.debug("import rpi_ws281x libs")
             from rpi_ws281x import *
@@ -739,14 +738,14 @@ if __name__ == '__main__':
             import webcolors
             import websocket
             from websocket import create_connection
-		
+
     try:
         while True:
             if eval(rmdItem._ip_ban_check_enable):
                 rmdItem.check_ipban()
-                logging.info("IP ban check done successfully")			     
+                logging.info("IP ban check done successfully")
 
-            logging.info("Update device status data.")	
+            logging.info("Update device status data.")
             rmdItem.getDeviceStatusData()
 
             ##checking devices for nessessary reboot
@@ -765,7 +764,7 @@ if __name__ == '__main__':
                         except:
                             logging.error("Error setting status LED for device {} ".format(device))
 
-                    else:						
+                    else:
                         rmdItem._rmd_data[device]['reboot_nessessary'] = True
                         if rmdItem.calc_past_min_from_now(rmdItem._rmd_data[device]['last_proto_data']) - int(rmdItem._rmd_data[device]['current_sleep_time']) > int(rmdItem._force_reboot_timeout) or eval(rmdItem._try_adb_first) is False: 
                             rmdItem._rmd_data[device]['reboot_force'] = True
@@ -788,7 +787,7 @@ if __name__ == '__main__':
                         rmdItem.discord_message(device, fixed=True)
                         rmdItem._rmd_data[device]['reboot_type'] = None
                         rmdItem._rmd_data[device]['reboot_forced'] = False
-                        rmdItem._rmd_data[device]['webhook_id'] = None  
+                        rmdItem._rmd_data[device]['webhook_id'] = None
 
                     ## set led status ok if enabled
                     try:
@@ -816,13 +815,13 @@ if __name__ == '__main__':
                         logging.debug("No device added to list dailyPowerCycleList.")
                 else:
                     logging.info("reboot_cycle_last_timestamp not older than configured wait time. skipping.")
-                    
+
             ## checking for rebooted devices
             rebootedDevicedList = []
-            logging.debug("Find rebooted devices for information and update discord message.")	
+            logging.debug("Find rebooted devices for information and update discord message.")
             logging.info("")
             logging.info("---------------------------------------------")
-            logging.info("Devices are rebooted. Waiting to come online:")	
+            logging.info("Devices are rebooted. Waiting to come online:")
             logging.info("---------------------------------------------")
             logging.info("")
 
@@ -840,11 +839,11 @@ if __name__ == '__main__':
                 logging.info("")
             else:
                 rmdItem.printTable(rebootedDevicedList, ['device','worker_status','last_proto_data','offline_minutes','reboot_count','last_reboot_time','reboot_ago_min'])
-                logging.info("")						
+                logging.info("")
 
             ##checking for bad devices
             badDevicedList = []
-            logging.debug("Find bad devices and reboot them.")	
+            logging.debug("Find bad devices and reboot them.")
             logging.info("")
             logging.info("---------------------------------------------")
             logging.info("Devices for reboot:")	
@@ -867,9 +866,9 @@ if __name__ == '__main__':
                 rmdItem.discord_message(badDevice["device"])
 
             logging.info("")
-            logging.debug("End of loop and waiting configured time before continue.")			
+            logging.debug("End of loop and waiting configured time before continue.")
             time.sleep(int(rmdItem._sleeptime_between_check)*60)
-		
+
     except KeyboardInterrupt:
         logging.info("RMD will be stopped")
-        exit(0)		
+        exit(0)
