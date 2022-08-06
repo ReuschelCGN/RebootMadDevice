@@ -33,7 +33,7 @@ Try if everything works, deactivate venv, leave bash:
 ```
 
 #### systemd service file for auto run/restart:
-create a new file named: rmd.service
+create a new file named: `rmd.service`
 ```
 [Unit]
 Description=RebootMadDevice
