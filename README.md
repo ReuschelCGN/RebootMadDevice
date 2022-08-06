@@ -7,7 +7,7 @@ After restarting MAD it will take about 5 minutes before data is usable.
 
 #### Install:
 ```
-Raspberry or Server:
+Server:
 - git clone -b V3-docker https://github.com/ReuschelCGN/RebootMadDevice.git
 - copy config.ini.example to config.ini and adjust the values
 - insert content of docker-compose.yml into your existing docker-compose.yml from mad/rdm... etc
