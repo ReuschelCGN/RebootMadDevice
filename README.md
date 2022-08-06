@@ -11,7 +11,6 @@ Create a service user for RMD and grant rights for gpio usage:
 - sudo adduser --system --home /opt/rmd --group rmd
 - sudo adduser rmd gpio
 ```
-
 #### Install:
 ```
 Start bash as service user and install service and requirements:
