@@ -95,9 +95,9 @@ or
 - usable with snmp
 - usable with gpio
 - relay mode NC or NO
-HINT to devices.json:
-For SWITCH_MODE "GPIO" -> SWITCH_VALUE use GPIO.BCM so its the GPIO number (not the pin number) -> SWITCH_OPTION is NC or NO (NC = normally closed / NO = normally open) and False if pin is then without power (Relais is in standby).
-
+HINT to devices.json for SWITCH_MODE "GPIO":
+SWITCH_VALUE use GPIO.BCM so its the GPIO number (not the pin number)
+SWITCH_OPTION is NC or NO (NC = normally closed / NO = normally open) and False if pin is then without power (Relais is in standby)
 ```
 #### Whats new:
 ```
