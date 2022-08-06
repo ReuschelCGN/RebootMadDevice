@@ -1,0 +1,15 @@
+  rmd:
+    container_name: rmd
+    build:
+      context: ./RebootMadDevice
+    command: python3 rebootMadDevice.py
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./RebootMadDevice/config.ini:/usr/src/app/config.ini
+      - ./RebootMadDevice/devices.json:/usr/src/app/devices.json
+    depends_on:
+      - name-of-your-db-container
+    networks:
+      - default
