@@ -25,7 +25,6 @@ from mysql.connector import pooling
 
 
 class rmdItem(object):
-    
     ## read config
     _config = configparser.ConfigParser()
     _rootdir = os.path.dirname(os.path.abspath('config.ini'))
