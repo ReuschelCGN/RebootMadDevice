@@ -6,6 +6,8 @@ greenlet==1.1.2
 idna==3.3
 mysql-connector==2.2.9
 requests==2.27.1
+RPi.GPIO==0.7.0
+rpi-ws281x==4.2.3
 urllib3==1.26.9
 webcolors==1.11.1
 websocket==0.2.1
