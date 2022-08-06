@@ -49,6 +49,7 @@ or
 - ADB reboot optional
 - manual reboot script for testing
 - IP ban check for MAD backend and PTC
+- docker environment
 ```
 ## License
 See the [LICENSE](https://github.com/GhostTalker/RebootMadDevice/blob/master/LICENSE.md) file for license rights and limitations (MIT).
