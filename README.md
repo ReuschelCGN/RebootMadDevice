@@ -10,6 +10,7 @@ After restarting MAD it will take about 5 minutes before data is usable.
 Server:
 - git clone -b V3-docker https://github.com/ReuschelCGN/RebootMadDevice.git
 - copy config.ini.example to config.ini and adjust the values
+- copy devices.json.example to devices.json and adjust the values
 - insert content of docker-compose.yml into your existing docker-compose.yml from mad/rdm... etc
 - docker-compose build rmd
 - docker-compose up -d rmd
@@ -39,6 +40,8 @@ or
 - usable with gpio
 - relay mode NC or NO
 ```
+
+
 #### Whats new:
 ```
 - RDM support
