@@ -48,7 +48,7 @@ Restart=on-abnormal
 [Install]
 WantedBy=multi-user.target
 ```
-
+add rmd as new service to systemd:
 ```
 Copy this file into /etc/systemd/system as root:
 - sudo cp rmd.service /etc/systemd/system/rmd.service
