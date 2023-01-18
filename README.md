@@ -40,10 +40,12 @@ Description=RebootMadDevice
 After=network.target
 
 [Service]
-User=root
-WorkingDirectory=/opt/rmd/
-ExecStart=python3 rebootMadDevice.py
-Restart=on-abnormal
+User=rmd
+Group=rmd
+ExecStart=/opt/rmd/RMDclientDaemon.sh start
+ExecReload=/opt/rmd/RMDclientDaemon.sh restart
+Restart=on-failure
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
