@@ -1,6 +1,6 @@
 # Docker image for RebootMadDevice
 
-FROM python:3.8.10
+FROM python:3.8.10-slim
 
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update \
 && apt-get install -y --no-install-recommends
