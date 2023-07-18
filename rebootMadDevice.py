@@ -869,7 +869,7 @@ if __name__ == '__main__':
                 logging.info("")
             else:
                 rmdItem.printTable(rebootedDevicedList, ['device','worker_status','last_proto_data','offline_minutes','count','last_reboot_time','reboot_ago_min','type'])
-                logging.info("")						
+                logging.info("")
 
             ##checking for bad devices
             badDevicedList = []
