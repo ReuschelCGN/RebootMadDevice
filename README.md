@@ -85,6 +85,23 @@ or
    ManualReboot.py --origin <DEVICE_ORIGIN_TO_REBOOT>
 ```
 
+#### ADD MAPPER RESTART SCRIPT:
+
+To use the mapper restart option the config parameter TRY_RESTART_MAPPER_FIRST has to be true.
+```
+TRY_RESTART_MAPPER_FIRST = True
+```
+Next step is to add the "MAPPER_MODE" to the device.json like:
+```
+"MAPPER_MODE": "ATLAS"
+```
+Then a bash script with the commands has to be created in the folder. The name has to be:
+```
+restart<MAPPER_MODE_VALUE>.sh
+```
+It is possible to use different MAPPER_MODE on each device.
+
+
 #### Features and supported hardware:
 ```
 - Reboot every device one times within 24 hours (optional)
