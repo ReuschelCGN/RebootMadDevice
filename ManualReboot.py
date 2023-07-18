@@ -5,7 +5,7 @@
 #
 __author__ = "GhostTalker"
 __copyright__ = "Copyright 2022, The GhostTalker project"
-__version__ = "3.0.2"
+__version__ = "3.1.1"
 __status__ = "TEST"
 
 # generic/built-in and other libs
@@ -51,19 +51,18 @@ class rmdItem(object):
     _config.read(_rootdir + "/config.ini")
     _gpio_usage = _config.get("GPIO", "GPIO_USAGE")
 
-
     def __init__(self):
         self.initRMDdata()
 
     def initRMDdata(self):
         # init dict 
         self._rmd_data = {}
-    
+
         # read json file
         print("Read data from devices.json file.")
         with open('devices.json') as json_file:
            _jsondata = json.load(json_file) 
-    
+
         # init rmd data in dict
         print("Init rmd data dictonary.")
         for device in _jsondata:
@@ -83,7 +82,6 @@ class rmdItem(object):
                                 'reboot_type': None,
                                 'reboot_forced': False,
                                 'webhook_id': None}
-    	
 
     def reboot_device_via_power(self, DEVICE_ORIGIN_TO_REBOOT):
         ## read powerSwitch config
@@ -91,7 +89,7 @@ class rmdItem(object):
         powerSwitchOption = self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['switch_option']
         powerSwitchValue = self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['switch_value']
 
-        ## HTML 
+        ## HTML
         if powerSwitchMode == 'HTML':
             print("PowerSwitch with HTML starting.")
             poweron = powerSwitchValue.split(";")[0]
@@ -165,7 +163,7 @@ class rmdItem(object):
             print("PowerSwitch with GPIO done.")
             return
 
-        ## CMD 
+        ## CMD
         elif powerSwitchMode == 'CMD':
             print("PowerSwitch with CMD starting.")
             try:
@@ -178,7 +176,7 @@ class rmdItem(object):
             self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_type'] = "CMD"
             return
 
-        ## SCRIPT 
+        ## SCRIPT
         elif powerSwitchMode == 'SCRIPT':
             print("PowerSwitch with SCRIPT starting.")
             poweron = powerSwitchValue.split(";")[0]
@@ -197,7 +195,7 @@ class rmdItem(object):
             print("PowerSwitch with SCRIPT done.")
             return
 
-        ## POE 
+        ## POE
         elif powerSwitchMode == 'POE':
             print("PowerSwitch with POE starting.")
             try:
@@ -228,7 +226,7 @@ class rmdItem(object):
                 print("failed send command to PowerBoard")
             print("PowerSwitch with PB done.")
             return
-			
+
         ## SNMP
         elif powerSwitchMode == 'SNMP':
             print("PowerSwitch with SNMP starting.")
@@ -253,18 +251,15 @@ class rmdItem(object):
         else:
             logging.warning("no PowerSwitch configured. Do it manually!!!")
 
-
 if __name__ == '__main__':
     ## init rmdItem
     rmdItem = rmdItem()
-		
+
     # GPIO import libs
     if eval(rmdItem._gpio_usage):
         print("import GPIO libs")
         import RPi.GPIO as GPIO
 
+    DEVICE_ORIGIN_TO_REBOOT = main() 
     print('Origin to reboot is', DEVICE_ORIGIN_TO_REBOOT)
-    rmdItem.doRebootDevice(DEVICE_ORIGIN_TO_REBOOT)
-    
-
-
+    rmdItem.reboot_device_via_power(DEVICE_ORIGIN_TO_REBOOT)
