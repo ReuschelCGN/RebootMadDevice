@@ -120,6 +120,8 @@ SWITCH_OPTION is NC or NO (NC = normally closed / NO = normally open) and False 
 ```
 #### Whats new:
 ```
+- Add waittime for force reboots
+- Add support to restart mapper software instead of reboot
 - RDM support
 - based on MAD/RDM database 
 - timeout can be configured in config.ini
