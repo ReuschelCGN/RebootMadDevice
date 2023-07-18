@@ -18,6 +18,7 @@ import getopt
 import time
 import json
 import requests
+import json
 
 # check syntax and arguments
 if (len(sys.argv) < 1 or len(sys.argv) > 3):

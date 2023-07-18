@@ -4,8 +4,8 @@
 # Script to restart ATV devices which are not responsable
 #
 __author__ = "GhostTalker"
-__copyright__ = "Copyright 2022, The GhostTalker project"
-__version__ = "3.1.2"
+__copyright__ = "Copyright 2023, The GhostTalker project"
+__version__ = "3.2.4"
 __status__ = "TEST"
 
 
@@ -37,9 +37,12 @@ class rmdItem(object):
     _mysqldbtype = _config.get("DATABASE", "DB_TYPE")
     _mysql_utc = _config.getboolean("DATABASE", "DB_UTC_TIME", fallback=False)
     _try_adb_first = _config.get("REBOOTOPTIONS", "TRY_ADB_FIRST")
+    _try_restart_mapper_first = _config.get("REBOOTOPTIONS", "TRY_RESTART_MAPPER_FIRST", fallback='False')
     _sleeptime_between_check = _config.get("REBOOTOPTIONS", "SLEEPTIME_BETWEEN_CHECK", fallback=5)
     _proto_timeout = _config.get("REBOOTOPTIONS", "PROTO_TIMEOUT", fallback=15)
     _force_reboot_timeout = _config.get("REBOOTOPTIONS", "FORCE_REBOOT_TIMEOUT", fallback=20)
+    _force_reboot_waittime = _config.get("REBOOTOPTIONS", "FORCE_REBOOT_WAITTIME", fallback=0)
+    _off_on_sleep = _config.get("REBOOTOPTIONS", "OFF_ON_SLEEP", fallback=5)
     _reboot_waittime = _config.get("REBOOTOPTIONS", "REBOOT_WAITTIME", fallback=15)
     _adb_path = _config.get("ENVIROMENT", "ADB_PATH", fallback='/usr/bin')
     _adb_port = _config.get("ENVIROMENT", "ADB_PORT", fallback='5555')
@@ -120,6 +123,7 @@ class rmdItem(object):
         logging.debug("Init rmd data dictonary.")
         for device in _jsondata:
             self._rmd_data[device]= {'ip_address': _jsondata[device]["IP_ADDRESS"],
+                                'mapper_mode': _jsondata[device]["MAPPER_MODE"],
                                 'switch_mode': _jsondata[device]["SWITCH_MODE"],
                                 'switch_option': _jsondata[device]["SWITCH_OPTION"],
                                 'switch_value': _jsondata[device]["SWITCH_VALUE"],
@@ -134,6 +138,7 @@ class rmdItem(object):
                                 'reboot_force': False,
                                 'reboot_type': None,
                                 'reboot_forced': False,
+                                'last_reboot_forced_time': None,
                                 'webhook_id': None}
 
 
@@ -178,7 +183,7 @@ class rmdItem(object):
                             self._rmd_data[row[0]]['idle_status'] = row[3]
                             self._rmd_data[row[0]]['worker_status'] = row[4]
                         except:
-                            logging.debug("Device not configured. Ignoring data.")
+                            logging.debug("Device {} not configured. Ignoring data.".format(row[0]))
                     elif self._mysqldbtype == "RDM":	
                         try:
                             self._rmd_data[row[0]]['last_proto_data'] = row[1]
@@ -186,7 +191,7 @@ class rmdItem(object):
                             self._rmd_data[row[0]]['idle_status'] = 0
                             self._rmd_data[row[0]]['worker_status'] = row[2]
                         except:
-                            logging.debug("Device not configured. Ignoring data.")
+                            logging.debug("Device {} not configured. Ignoring data.".format(row[0]))
                     else:
                         logging.error("DB Type not known. Please check config")
 
@@ -340,8 +345,8 @@ class rmdItem(object):
 
     def discord_message(self, device_origin, fixed=False):
         if not self._discord_webhook_enable:
-            return 
-        
+            return
+
         # create data for webhook
         logging.info('Start Webhook for device ' + device_origin )
 
@@ -460,11 +465,13 @@ class rmdItem(object):
 
         logging.info("Origin to reboot is: {}".format(DEVICE_ORIGIN_TO_REBOOT))
         logging.info("Force option is: {}".format(self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_force']))
+        logging.debug("Rebootcount is: {}".format(self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_count']))
 
         self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_count'] = self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_count'] + 1
         self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['last_reboot_time'] = self.makeTimestamp()
 
-        if self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_force']:
+        if self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_force'] and self.calc_past_min_from_now(self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['last_reboot_forced_time']) > int(self._force_reboot_waittime):
+            self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['last_reboot_forced_time'] = self.makeTimestamp()
             self.reboot_device_via_power(DEVICE_ORIGIN_TO_REBOOT)
             return
         while counter < try_counter:
@@ -504,6 +511,21 @@ class rmdItem(object):
 
 
     def reboot_device(self, DEVICE_ORIGIN_TO_REBOOT):
+        if eval(self._try_restart_mapper_first):
+            logging.info("Try to restart {} on Device {}".format(self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['mapper_mode'],DEVICE_ORIGIN_TO_REBOOT))
+            try:
+                ADBLOC="{}/adb".format(self._adb_path)
+                DEVICELOC="{}:{}".format(self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['ip_address'], self._adb_port)
+                MAPPERSCRIPT="{}/restart{}.sh".format(self._rootdir, self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['mapper_mode'] )
+                logging.debug("Mapper-Script command: {}".format(MAPPERSCRIPT))
+                subprocess.Popen([MAPPERSCRIPT, ADBLOC, DEVICELOC])
+                logging.info("Restart Mapper on Device {} was successfull.".format(DEVICE_ORIGIN_TO_REBOOT))
+                self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_forced'] = False
+                self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_type'] = "MAPPER"
+                return
+            except:			
+                logging.info("Execute of restart Mapper on Device {} was not successfull. Try reboot device now.".format(DEVICE_ORIGIN_TO_REBOOT))
+
         #cmd = "{}/adb -s {}:{} reboot".format(self.adb_path, self.device_list[DEVICE_ORIGIN_TO_REBOOT], self.adb_port)
         logging.info("rebooting Device {}. Please wait".format(DEVICE_ORIGIN_TO_REBOOT))
         try:
@@ -536,7 +558,7 @@ class rmdItem(object):
             poweroff = powerSwitchValue.split(";")[1]
             logging.info("turn HTTP PowerSwitch off")
             requests.get(poweroff)
-            time.sleep(5)
+            time.sleep(int(self._off_on_sleep))
             logging.info("turn HTTP PowerSwitch on")
             requests.get(poweron)
             logging.debug("PowerSwitch with HTML done.")
@@ -610,7 +632,7 @@ class rmdItem(object):
                 subprocess.check_output(powerSwitchValue, shell=True)
             except subprocess.CalledProcessError:
                 logging.error("failed to fire command")
-            time.sleep(5)
+            time.sleep(int(self._off_on_sleep))
             logging.debug("PowerSwitch with CMD done.")
             self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_forced'] = True
             self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_type'] = "CMD"
@@ -626,7 +648,7 @@ class rmdItem(object):
                 subprocess.check_output(poweroff, shell=True)
             except subprocess.CalledProcessError:
                 logging.error("failed to start script")
-            time.sleep(5)
+            time.sleep(int(self._off_on_sleep))
             logging.info("execute script for PowerSwitch on")
             try:
                 subprocess.check_output(poweron, shell=True)
@@ -642,7 +664,7 @@ class rmdItem(object):
                 subprocess.check_output(powerSwitchValue, shell=True)
             except subprocess.CalledProcessError:
                 logging.error("failed to fire poe port reset")
-            time.sleep(5)
+            time.sleep(int(self._off_on_sleep))
             logging.debug("PowerSwitch with POE done.")
             return
 
@@ -658,7 +680,7 @@ class rmdItem(object):
                 subprocess.check_output(pbportoff, shell=True)
             except subprocess.CalledProcessError:
                 logging.error("failed send command to PowerBoard")
-            time.sleep(5)
+            time.sleep(int(self._off_on_sleep))
             logging.info("send command to Powerboard for PowerSwitch on")
             try:
                 subprocess.check_output(pbporton, shell=True)
@@ -680,7 +702,7 @@ class rmdItem(object):
                 logging.info("send SNMP command port OFF to SWITCH")
             except subprocess.CalledProcessError:
                 logging.error("failed to fire SNMP command")
-            time.sleep(5)
+            time.sleep(int(self._off_on_sleep))
             try:
                 subprocess.check_output(snmpporton, shell=True)
                 logging.info("send SNMP command port ON to SWITCH")
@@ -715,12 +737,13 @@ if __name__ == '__main__':
     logrootdir = os.path.dirname(os.path.abspath('config.ini'))
     logconfig.read(logrootdir + "/config.ini")
     log_mode = logconfig.get("LOGGING", "LOG_MODE", fallback='console')
+    log_filename = logconfig.get("LOGGING", "LOG_FILENAME", fallback='RMDClient.log')
     log_level = logconfig.get("LOGGING", "LOG_LEVEL", fallback='INFO')
 
     if log_mode == "console":
         create_stdout_log()
-    elif _log_mode == "file":
-        create_timed_rotating_log('RMDclient.log')
+    elif log_mode == "file":
+        create_timed_rotating_log(log_filename)
     else:
         create_timed_rotating_log('/dev/null')
 
@@ -834,7 +857,7 @@ if __name__ == '__main__':
 
             for device in list(rmdItem._rmd_data):
                 if str(rmdItem._rmd_data[device]['reboot_nessessary']) == 'rebooting': 
-                    rebootedDevicedList.append({'device': device, 'worker_status': rmdItem._rmd_data[device]['worker_status'], 'last_proto_data': rmdItem.timestamp_to_readable_datetime(rmdItem._rmd_data[device]['last_proto_data']), 'offline_minutes': rmdItem.calc_past_min_from_now(rmdItem._rmd_data[device]['last_proto_data']), 'reboot_count': rmdItem._rmd_data[device]['reboot_count'], 'last_reboot_time': rmdItem.timestamp_to_readable_datetime(rmdItem._rmd_data[device]['last_reboot_time']), 'reboot_ago_min': rmdItem.calc_past_min_from_now(rmdItem._rmd_data[device]['last_reboot_time'])})
+                    rebootedDevicedList.append({'device': device, 'worker_status': rmdItem._rmd_data[device]['worker_status'], 'last_proto_data': rmdItem.timestamp_to_readable_datetime(rmdItem._rmd_data[device]['last_proto_data']), 'offline_minutes': rmdItem.calc_past_min_from_now(rmdItem._rmd_data[device]['last_proto_data']), 'count': rmdItem._rmd_data[device]['reboot_count'], 'last_reboot_time': rmdItem.timestamp_to_readable_datetime(rmdItem._rmd_data[device]['last_reboot_time']), 'reboot_ago_min': rmdItem.calc_past_min_from_now(rmdItem._rmd_data[device]['last_reboot_time']), 'type': rmdItem._rmd_data[device]['reboot_type']})
 
                     # Update no_data time and existing Discord messages
                     if rmdItem._rmd_data[device]['webhook_id'] is not None:
@@ -842,7 +865,7 @@ if __name__ == '__main__':
                             rmdItem.discord_message(device)
 
             if not rebootedDevicedList:
-                rmdItem.printTable([{'device': '-','worker_status': '-','last_proto_data': '-','offline_minutes': '-','reboot_count': '-','last_reboot_time': '-','reboot_ago_min': '-'}], ['device','worker_status','last_proto_data','offline_minutes','reboot_count','last_reboot_time','reboot_ago_min'])
+                rmdItem.printTable([{'device': '-','worker_status': '-','last_proto_data': '-','offline_minutes': '-','count': '-','last_reboot_time': '-','reboot_ago_min': '-','type': '-'}], ['device','worker_status','last_proto_data','offline_minutes','count','last_reboot_time','reboot_ago_min','type'])
                 logging.info("")
             else:
                 rmdItem.printTable(rebootedDevicedList, ['device','worker_status','last_proto_data','offline_minutes','reboot_count','last_reboot_time','reboot_ago_min'])
@@ -859,13 +882,13 @@ if __name__ == '__main__':
 
             for device in list(rmdItem._rmd_data):
                 if str(rmdItem._rmd_data[device]['reboot_nessessary']) == 'True':
-                    badDevicedList.append({'device': device, 'worker_status': rmdItem._rmd_data[device]['worker_status'], 'last_proto_data': rmdItem.timestamp_to_readable_datetime(rmdItem._rmd_data[device]['last_proto_data']), 'offline_minutes': rmdItem.calc_past_min_from_now(rmdItem._rmd_data[device]['last_proto_data']), 'reboot_count': rmdItem._rmd_data[device]['reboot_count'], 'reboot_nessessary': rmdItem._rmd_data[device]['reboot_nessessary'], 'reboot_force': rmdItem._rmd_data[device]['reboot_force']})
+                    badDevicedList.append({'device': device, 'worker_status': rmdItem._rmd_data[device]['worker_status'], 'last_proto_data': rmdItem.timestamp_to_readable_datetime(rmdItem._rmd_data[device]['last_proto_data']), 'offline_minutes': rmdItem.calc_past_min_from_now(rmdItem._rmd_data[device]['last_proto_data']), 'count': rmdItem._rmd_data[device]['reboot_count'], 'reboot_nessessary': rmdItem._rmd_data[device]['reboot_nessessary'], 'force': rmdItem._rmd_data[device]['reboot_force']})
 
             if not badDevicedList:
-                rmdItem.printTable([{'device': '-','worker_status': '-','last_proto_data': '-','offline_minutes': '-','reboot_count': '-','reboot_nessessary': '-','reboot_force': '-'}], ['device','worker_status','last_proto_data','offline_minutes','reboot_count','reboot_nessessary','reboot_force'])
+                rmdItem.printTable([{'device': '-','worker_status': '-','last_proto_data': '-','offline_minutes': '-','count': '-','reboot_nessessary': '-', 'force': '-'}], ['device','worker_status','last_proto_data','offline_minutes','count','reboot_nessessary','force'])
                 logging.info("")
             else:
-                rmdItem.printTable(badDevicedList, ['device','worker_status','last_proto_data','offline_minutes','reboot_count','reboot_nessessary','reboot_force'])
+                rmdItem.printTable(badDevicedList, ['device','worker_status','last_proto_data','offline_minutes','count','reboot_nessessary','force'])
                 logging.info("")
 
             for badDevice in badDevicedList:
