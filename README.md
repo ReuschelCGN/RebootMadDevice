@@ -1,37 +1,21 @@
-# RebootMadDevice V3 - DB version
+# RebootMadDevice V3-docker - Docker DB version for server
 Reboot ATV devices via ADB or PowerSwitch when device is not responding to MAD or RDM.
 
 Only works with Python 3.6 and above.
-
-Run the installation and this scripts not with sudo. Use root user!
-
-Running the daemon is only possible with root user!
 
 After restarting MAD it will take about 5 minutes before data is usable. 
 
 #### Install:
 ```
-Raspberry or Server:
-- pip3 install -r requirements.txt
-- pip3 install -r requirements_rpi.txt (only for raspberry - add support for GPIO and LED)
+Server:
+- git clone -b V3-docker https://github.com/ReuschelCGN/RebootMadDevice.git
 - copy config.ini.example to config.ini and adjust the values
-- adjust RMDdaemon.sh with install path
-```
+- copy devices.json.example to devices.json and adjust the values
+- insert content of docker-compose.yml into your existing docker-compose.yml from mad/rdm... etc
+- docker-compose build rmd
+- docker-compose up -d rmd
 
-#### Using the daemon:
- 
-The deamon has to be started with:
-```
-RMDdaemon.sh start
-```
-if you want to check that is running:
-```
-RMDdaemon.sh status
-```
-
-and if you want to stop:
-```
-RMDdaemon.sh stop
+- for logs: docker-compose logs -f -t rmd
 ```
 
 #### Doing a manual reboot (e.g. for testing):
@@ -73,20 +57,21 @@ It is possible to use different MAPPER_MODE on each device.
 - usable with gpio
 - relay mode NC or NO
 ```
+
+
 #### Whats new:
 ```
 - Add waittime for force reboots
 - Add support to restart mapper software instead of reboot
 - RDM support
 - based on MAD/RDM database 
-- client architecture
 - timeout can be configured in config.ini
 - next reboot of a device only after defined timeframe
 - Discord Webhook support (without discord_webhook dependency)
-- devided requirements in two parts (general and raspi)
 - ADB reboot optional
 - manual reboot script for testing
 - IP ban check for MAD backend and PTC
+- docker environment
 ```
 ## License
 See the [LICENSE](https://github.com/GhostTalker/RebootMadDevice/blob/master/LICENSE.md) file for license rights and limitations (MIT).
