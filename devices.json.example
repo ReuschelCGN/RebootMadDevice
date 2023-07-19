@@ -70,5 +70,13 @@
       "SWITCH_OPTION":"192.168.0.250;communitystring",
       "SWITCH_VALUE":"20",
       "LED_POSITION":"9"
+   },
+   "ATV10":{
+      "IP_ADDRESS":"192.168.0.10",
+      "MAPPER_MODE": "ATLAS",
+      "SWITCH_MODE":"MAD",
+      "SWITCH_OPTION":"",
+      "SWITCH_VALUE":"http://madUrl:5000/",
+      "LED_POSITION":"10"
    }
 }
