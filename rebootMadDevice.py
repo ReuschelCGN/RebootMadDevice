@@ -564,6 +564,16 @@ class rmdItem(object):
             logging.debug("PowerSwitch with HTML done.")
             return        
 
+        ## MAD
+        if powerSwitchMode == 'MAD':
+            logging.debug("Restart with MAD starting.")
+            restarturl = powerSwitchValue + "restart_phone?origin=" + DEVICE_ORIGIN_TO_REBOOT + "&adb=False"
+            logging.info("send MAD PowerSwitch restart")
+            requests.get(restarturl)
+            time.sleep(10)
+            logging.debug("Restart with MAD done.")
+            return
+
         ## GPIO
         elif powerSwitchMode == 'GPIO':
             logging.debug("PowerSwitch with GPIO starting.")
