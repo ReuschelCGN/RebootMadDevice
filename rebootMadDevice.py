@@ -523,7 +523,7 @@ class rmdItem(object):
                 self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_forced'] = False
                 self._rmd_data[DEVICE_ORIGIN_TO_REBOOT]['reboot_type'] = "MAPPER"
                 return
-            except:			
+            except:
                 logging.info("Execute of restart Mapper on Device {} was not successfull. Try reboot device now.".format(DEVICE_ORIGIN_TO_REBOOT))
 
         #cmd = "{}/adb -s {}:{} reboot".format(self.adb_path, self.device_list[DEVICE_ORIGIN_TO_REBOOT], self.adb_port)
