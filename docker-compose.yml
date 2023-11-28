@@ -7,9 +7,7 @@
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - ./RebootMadDevice/config.ini:/usr/src/app/config.ini
-      - ./RebootMadDevice/devices.json:/usr/src/app/devices.json
-    depends_on:
-      - name-of-your-db-container
+      - ./RebootMadDevice/config/config.ini:/usr/src/app/config/config.ini
+      - ./RebootMadDevice/config/devices.json:/usr/src/app/config/devices.json
     networks:
       - default
