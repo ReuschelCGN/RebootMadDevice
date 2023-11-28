@@ -1,14 +1,14 @@
-# RebootMadDevice V3-docker - Docker DB version for server
-Reboot ATV devices via ADB or PowerSwitch when device is not responding to MAD or RDM.
+# RebootMadDevice V4-docker - Rotom API version ( under developing)
+Reboot ATV devices via ADB or PowerSwitch when device is not responding to Rotom.
 
 Only works with Python 3.6 and above.
 
-After restarting MAD it will take about 5 minutes before data is usable. 
+After restarting Rotom it will take up to 2 minutes before data is usable. 
 
 #### Install:
 ```
 Server:
-- git clone -b V3-docker https://github.com/ReuschelCGN/RebootMadDevice.git
+- git clone -b V4-docker https://github.com/ReuschelCGN/RebootMadDevice.git
 - copy config.ini.example to config.ini and adjust the values
 - copy devices.json.example to devices.json and adjust the values
 - insert content of docker-compose.yml into your existing docker-compose.yml from mad/rdm... etc
@@ -19,7 +19,7 @@ Server:
 ```
 
 #### Doing a manual reboot (e.g. for testing):
- 
+
 A manual reboot can be done with the ManualReboot.py script:
 ```
    ManualReboot.py -o <DEVICE_ORIGIN_TO_REBOOT>
@@ -44,10 +44,22 @@ restart<MAPPER_MODE_VALUE>.sh
 It is possible to use different MAPPER_MODE on each device.
 
 
-#### Features and supported hardware:
+### PROMETHEUS CONFIG:
+Use IP address of the device where RMD is running and PORT is configured in the config.ini
 ```
+  - job_name: 'rmd'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['<IP>:<Port>']
+```
+
+
+### Features and supported hardware:
+```
+- Grafana template added
 - Reboot every device one times within 24 hours (optional)
-- RDM and MAD support
+- Flygon support only
+- Prometheus metrics
 - support for status LED with WS2812 led stripe
 - support for external status LED via websocket (https://github.com/FabLab-Luenen/McLighting)
 - usable with PowerBoard (Link will follow)
@@ -56,22 +68,24 @@ It is possible to use different MAPPER_MODE on each device.
 - usable with snmp
 - usable with gpio
 - relay mode NC or NO
-```
-
-
-#### Whats new:
-```
-- Add waittime for force reboots
-- Add support to restart mapper software instead of reboot
-- RDM support
-- based on MAD/RDM database 
+- ADB reboot optional
 - timeout can be configured in config.ini
 - next reboot of a device only after defined timeframe
+- IP ban check for PTC
 - Discord Webhook support (without discord_webhook dependency)
-- ADB reboot optional
-- manual reboot script for testing
-- IP ban check for MAD backend and PTC
-- docker environment
+- devided requirements in two parts (general and raspi)
+- client architecture
+- Add waittime for force reboots
+- Add support to restart mapper software instead of reboot
+- manual reboot script for testing (work in progress)
+- Restart for mapper software
+```
+### Whats new:
+```
+- Rotom API support
+- added Rotom API secret
+- Prometheus metrics
+- parallize device request
 ```
 ## License
 See the [LICENSE](https://github.com/GhostTalker/RebootMadDevice/blob/master/LICENSE.md) file for license rights and limitations (MIT).
