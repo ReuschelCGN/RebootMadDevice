@@ -11,7 +11,7 @@ Server:
 - git clone -b V4-docker https://github.com/ReuschelCGN/RebootMadDevice.git
 - copy config.ini.example to config.ini and adjust the values
 - copy devices.json.example to devices.json and adjust the values
-- insert content of docker-compose.yml into your existing docker-compose.yml from mad/rdm... etc
+- insert content of docker-compose.yml into your existing docker-compose.yml from rotom/dragonite... etc
 - docker-compose build rmd
 - docker-compose up -d rmd
 
