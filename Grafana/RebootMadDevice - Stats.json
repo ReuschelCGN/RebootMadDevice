@@ -1176,7 +1176,44 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "last_reboot"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeFromNow"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "last_force"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeFromNow"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "last_seen"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeFromNow"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -1196,8 +1233,8 @@
         "showHeader": true,
         "sortBy": [
           {
-            "desc": true,
-            "displayName": "last_reboot"
+            "desc": false,
+            "displayName": "Device"
           }
         ]
       },
@@ -1538,6 +1575,6 @@
   "timezone": "browser",
   "title": "RebootMadDevice - Stats",
   "uid": "c0292d44-7f5f-4ca9-bba8-3e52716c5005",
-  "version": 17,
+  "version": 19,
   "weekStart": "saturday"
 }
