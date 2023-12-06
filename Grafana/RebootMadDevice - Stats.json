@@ -33,7 +33,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "10.0.2"
+      "version": "9.1.0"
     },
     {
       "type": "datasource",
@@ -66,6 +66,12 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
@@ -89,9 +95,7 @@
           },
           "custom": {
             "align": "center",
-            "cellOptions": {
-              "type": "color-text"
-            },
+            "displayMode": "auto",
             "inspect": false
           },
           "mappings": [],
@@ -109,10 +113,23 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "led_position"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 111
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 18,
+        "h": 12,
         "w": 15,
         "x": 0,
         "y": 0
@@ -128,9 +145,10 @@
           ],
           "show": false
         },
-        "showHeader": true
+        "showHeader": true,
+        "sortBy": []
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "9.1.0",
       "targets": [
         {
           "datasource": {
@@ -173,13 +191,16 @@
       },
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
           "custom": {
             "align": "auto",
-            "cellOptions": {
-              "type": "color-text"
-            },
+            "displayMode": "color-text",
             "inspect": false
           },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -199,7 +220,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 150
+                "value": 141
               }
             ]
           },
@@ -211,7 +232,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 161
               }
             ]
           },
@@ -223,7 +244,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 80
+                "value": 82
               }
             ]
           },
@@ -235,7 +256,55 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 80
+                "value": 71
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #B"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 81
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "__name__"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 152
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Value #A"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 82
               }
             ]
           },
@@ -247,7 +316,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 120
+                "value": 111
               }
             ]
           }
@@ -259,26 +328,20 @@
         "x": 15,
         "y": 0
       },
-      "id": 1,
+      "id": 12,
       "options": {
-        "cellHeight": "sm",
         "footer": {
-          "countRows": false,
           "fields": "",
           "reducer": [
             "sum"
           ],
           "show": false
         },
+        "frameIndex": 0,
         "showHeader": true,
-        "sortBy": [
-          {
-            "desc": false,
-            "displayName": "__name__"
-          }
-        ]
+        "sortBy": []
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "9.1.0",
       "targets": [
         {
           "datasource": {
@@ -289,10 +352,8 @@
           "exemplar": false,
           "expr": "rmd_build_version_info{instance=~\"$InstanceName\"}",
           "format": "table",
-          "hide": false,
           "instant": true,
-          "interval": "",
-          "legendFormat": "__auto",
+          "legendFormat": "Versions",
           "range": false,
           "refId": "A"
         },
@@ -307,7 +368,7 @@
           "format": "table",
           "hide": false,
           "instant": true,
-          "legendFormat": "__auto",
+          "legendFormat": "Running Cycles",
           "range": false,
           "refId": "B"
         }
@@ -315,25 +376,31 @@
       "title": "RMD Clients and Versions",
       "transformations": [
         {
-          "id": "joinByField",
+          "id": "concatenate",
           "options": {
-            "byField": "instance",
-            "mode": "outer"
+            "frameNameLabel": "frame",
+            "frameNameMode": "drop"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "instance 1",
+                "job 1",
+                "started",
+                "status",
+                "version",
+                "Value #B"
+              ]
+            }
           }
         },
         {
           "id": "organize",
           "options": {
-            "excludeByName": {
-              "Time 1": true,
-              "Time 2": true,
-              "Value #A": true,
-              "__name__ 1": true,
-              "__name__ 2": true,
-              "job 1": true,
-              "job 2": true,
-              "status": false
-            },
+            "excludeByName": {},
             "indexByName": {},
             "renameByName": {
               "Value #B": "Running cycles"
@@ -429,7 +496,7 @@
         "showThresholdLabels": true,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "9.1.0",
       "targets": [
         {
           "datasource": {
@@ -584,7 +651,7 @@
         "showThresholdLabels": true,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "9.1.0",
       "targets": [
         {
           "datasource": {
@@ -767,7 +834,7 @@
         "showThresholdLabels": true,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "10.0.2",
+      "pluginVersion": "9.1.0",
       "targets": [
         {
           "datasource": {
@@ -909,7 +976,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 10,
         "w": 9,
         "x": 15,
         "y": 11
@@ -985,8 +1052,6 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "axisSoftMax": 10,
-            "axisSoftMin": 0,
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 0,
@@ -1038,21 +1103,21 @@
                 "value": 20
               }
             ]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 15,
         "x": 0,
-        "y": 18
+        "y": 12
       },
       "id": 6,
       "options": {
         "legend": {
           "calcs": [
+            "last",
             "sum"
           ],
           "displayMode": "table",
@@ -1080,6 +1145,225 @@
       ],
       "title": "Reboots per device",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 15,
+        "x": 0,
+        "y": 20
+      },
+      "id": 14,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "last_reboot"
+          }
+        ]
+      },
+      "pluginVersion": "9.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rmd_metric_device_last_seen{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rmd_metric_device_last_reboot_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rmd_metric_device_last_reboot_forced_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rmd_metric_device_reboot_count{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rmd_metric_device_workstep{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "rmd_metric_device_webhook_id{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
+          "format": "table",
+          "hide": false,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "F"
+        }
+      ],
+      "title": "RMD Device Status",
+      "transformations": [
+        {
+          "id": "concatenate",
+          "options": {
+            "frameNameLabel": "frame",
+            "frameNameMode": "field"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__ 1": true,
+              "__name__ 2": true,
+              "__name__ 3": true,
+              "__name__ 4": true,
+              "__name__ 5": true,
+              "device 2": true,
+              "device 3": true,
+              "device 4": true,
+              "device 5": true,
+              "instance 1": true,
+              "instance 2": true,
+              "instance 3": true,
+              "instance 4": true,
+              "instance 5": true,
+              "job 1": true,
+              "job 2": true,
+              "job 3": true,
+              "job 4": true,
+              "job 5": true
+            },
+            "indexByName": {},
+            "renameByName": {
+              "Value #A": "last_seen",
+              "Value #B": "last_reboot",
+              "Value #C": "last_force",
+              "Value #D": "reboot_count",
+              "Value #F": "WebhookID",
+              "device 1": "Device",
+              "instance 1": ""
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "dateFormat": "",
+                "destinationType": "time",
+                "targetField": "last_seen"
+              },
+              {
+                "dateFormat": "",
+                "destinationType": "time",
+                "targetField": "last_reboot"
+              },
+              {
+                "dateFormat": "",
+                "destinationType": "time",
+                "targetField": "last_force"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "datasource": {
@@ -1155,7 +1439,7 @@
         "h": 9,
         "w": 9,
         "x": 15,
-        "y": 18
+        "y": 21
       },
       "id": 7,
       "options": {
@@ -1188,1027 +1472,10 @@
       ],
       "title": "Reboots overall",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "center",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_seen"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 173
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_reboot"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 163
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_force"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 163
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Device"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 118
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "reboot_count"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 116
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "area_name"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 337
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "curr_step"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 113
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "start_step"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 89
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "end_step"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 102
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 16,
-        "w": 13,
-        "x": 0,
-        "y": 27
-      },
-      "id": 3,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "10.0.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_seen{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_reboot_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_reboot_forced_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_reboot_count{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_webhook_id{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "F"
-        }
-      ],
-      "title": "RMD Device Status",
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "device",
-            "mode": "outer"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time 1": true,
-              "Time 2": true,
-              "Time 3": true,
-              "Time 4": true,
-              "Time 5": true,
-              "Time 6": true,
-              "__name__ 1": true,
-              "__name__ 2": true,
-              "__name__ 3": true,
-              "__name__ 4": true,
-              "__name__ 5": true,
-              "__name__ 6": true,
-              "area_id": true,
-              "instance 1": true,
-              "instance 2": true,
-              "instance 3": true,
-              "instance 4": true,
-              "instance 5": true,
-              "instance 6": true,
-              "job 1": true,
-              "job 2": true,
-              "job 3": true,
-              "job 4": true,
-              "job 5": true,
-              "job 6": true
-            },
-            "indexByName": {
-              "Time 1": 1,
-              "Time 2": 6,
-              "Time 3": 11,
-              "Time 4": 16,
-              "Time 5": 21,
-              "Value #A": 5,
-              "Value #B": 10,
-              "Value #C": 15,
-              "Value #D": 20,
-              "Value #E": 25,
-              "__name__ 1": 2,
-              "__name__ 2": 7,
-              "__name__ 3": 12,
-              "__name__ 4": 17,
-              "__name__ 5": 22,
-              "area_id": 23,
-              "area_name": 24,
-              "device": 0,
-              "end_step": 27,
-              "instance 1": 3,
-              "instance 2": 8,
-              "instance 3": 13,
-              "instance 4": 18,
-              "instance 5": 28,
-              "job 1": 4,
-              "job 2": 9,
-              "job 3": 14,
-              "job 4": 19,
-              "job 5": 29,
-              "start_step": 26
-            },
-            "renameByName": {
-              "Value #A": "last_seen",
-              "Value #B": "last_reboot",
-              "Value #C": "last_force",
-              "Value #D": "reboot_count",
-              "Value #E": "curr_step",
-              "Value #F": "WebhookID",
-              "device": "Device",
-              "end_step": "end_step",
-              "start_step": "start_step"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "center",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_seen"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 173
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_reboot"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 163
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_force"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 163
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Device"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 118
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "reboot_count"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 116
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "status"
-            },
-            "properties": [
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "1": {
-                        "index": 1,
-                        "text": "rebooting"
-                      },
-                      "2": {
-                        "index": 0,
-                        "text": "offline"
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
-              },
-              {
-                "id": "custom.width",
-                "value": 120
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 11,
-        "x": 13,
-        "y": 27
-      },
-      "id": 10,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "10.0.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_seen{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_reboot_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_reboot_forced_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_reboot_count{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "rmd_metric_device_status{device=~\"$DeviceName\", instance=~\"$InstanceName\"} == 2",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "range": false,
-          "refId": "E"
-        }
-      ],
-      "title": "Offline Devices",
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "device",
-            "mode": "outer"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time 1": true,
-              "Time 2": true,
-              "Time 3": true,
-              "Time 4": true,
-              "Time 5": true,
-              "Time 6": true,
-              "Value #E": false,
-              "__name__ 1": true,
-              "__name__ 2": true,
-              "__name__ 3": true,
-              "__name__ 4": true,
-              "__name__ 5": true,
-              "__name__ 6": true,
-              "area_id": true,
-              "instance 1": true,
-              "instance 2": true,
-              "instance 3": true,
-              "instance 4": true,
-              "instance 5": true,
-              "instance 6": true,
-              "job 1": true,
-              "job 2": true,
-              "job 3": true,
-              "job 4": true,
-              "job 5": true,
-              "job 6": true
-            },
-            "indexByName": {
-              "Time 1": 1,
-              "Time 2": 6,
-              "Time 3": 11,
-              "Time 4": 16,
-              "Time 5": 21,
-              "Value #A": 5,
-              "Value #B": 10,
-              "Value #C": 15,
-              "Value #D": 20,
-              "Value #E": 25,
-              "__name__ 1": 2,
-              "__name__ 2": 7,
-              "__name__ 3": 12,
-              "__name__ 4": 17,
-              "__name__ 5": 22,
-              "area_id": 23,
-              "area_name": 24,
-              "device": 0,
-              "end_step": 27,
-              "instance 1": 3,
-              "instance 2": 8,
-              "instance 3": 13,
-              "instance 4": 18,
-              "instance 5": 28,
-              "job 1": 4,
-              "job 2": 9,
-              "job 3": 14,
-              "job 4": 19,
-              "job 5": 29,
-              "start_step": 26
-            },
-            "renameByName": {
-              "Value #A": "last_seen",
-              "Value #B": "last_reboot",
-              "Value #C": "last_force",
-              "Value #D": "reboot_count",
-              "Value #E": "status",
-              "Value #F": "WebhookID",
-              "device": "Device",
-              "end_step": "end_step",
-              "start_step": "start_step"
-            }
-          }
-        },
-        {
-          "id": "filterByValue",
-          "options": {
-            "filters": [
-              {
-                "config": {
-                  "id": "equal",
-                  "options": {
-                    "value": 2
-                  }
-                },
-                "fieldName": "status"
-              }
-            ],
-            "match": "all",
-            "type": "include"
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "center",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_seen"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 173
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_reboot"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 163
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "last_force"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "dateTimeFromNow"
-              },
-              {
-                "id": "custom.width",
-                "value": 163
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Device"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 118
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "reboot_count"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 116
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "status"
-            },
-            "properties": [
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "1": {
-                        "index": 1,
-                        "text": "rebooting"
-                      },
-                      "2": {
-                        "index": 0,
-                        "text": "offline"
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
-              },
-              {
-                "id": "custom.width",
-                "value": 120
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 11,
-        "x": 13,
-        "y": 35
-      },
-      "id": 11,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "10.0.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_seen{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_reboot_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_last_reboot_forced_time{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "rmd_metric_device_reboot_count{device=~\"$DeviceName\", instance=~\"$InstanceName\"}",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "__auto",
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "rmd_metric_device_status{device=~\"$DeviceName\", instance=~\"$InstanceName\"} == 1",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "range": false,
-          "refId": "E"
-        }
-      ],
-      "title": "Rebooting Devices",
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "device",
-            "mode": "outer"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time 1": true,
-              "Time 2": true,
-              "Time 3": true,
-              "Time 4": true,
-              "Time 5": true,
-              "Time 6": true,
-              "Value #E": false,
-              "__name__ 1": true,
-              "__name__ 2": true,
-              "__name__ 3": true,
-              "__name__ 4": true,
-              "__name__ 5": true,
-              "__name__ 6": true,
-              "area_id": true,
-              "instance 1": true,
-              "instance 2": true,
-              "instance 3": true,
-              "instance 4": true,
-              "instance 5": true,
-              "instance 6": true,
-              "job 1": true,
-              "job 2": true,
-              "job 3": true,
-              "job 4": true,
-              "job 5": true,
-              "job 6": true
-            },
-            "indexByName": {
-              "Time 1": 1,
-              "Time 2": 6,
-              "Time 3": 11,
-              "Time 4": 16,
-              "Time 5": 21,
-              "Value #A": 5,
-              "Value #B": 10,
-              "Value #C": 15,
-              "Value #D": 20,
-              "Value #E": 25,
-              "__name__ 1": 2,
-              "__name__ 2": 7,
-              "__name__ 3": 12,
-              "__name__ 4": 17,
-              "__name__ 5": 22,
-              "area_id": 23,
-              "area_name": 24,
-              "device": 0,
-              "end_step": 27,
-              "instance 1": 3,
-              "instance 2": 8,
-              "instance 3": 13,
-              "instance 4": 18,
-              "instance 5": 28,
-              "job 1": 4,
-              "job 2": 9,
-              "job 3": 14,
-              "job 4": 19,
-              "job 5": 29,
-              "start_step": 26
-            },
-            "renameByName": {
-              "Value #A": "last_seen",
-              "Value #B": "last_reboot",
-              "Value #C": "last_force",
-              "Value #D": "reboot_count",
-              "Value #E": "status",
-              "Value #F": "WebhookID",
-              "device": "Device",
-              "end_step": "end_step",
-              "start_step": "start_step"
-            }
-          }
-        },
-        {
-          "id": "filterByValue",
-          "options": {
-            "filters": [
-              {
-                "config": {
-                  "id": "equal",
-                  "options": {
-                    "value": 1
-                  }
-                },
-                "fieldName": "status"
-              }
-            ],
-            "match": "all",
-            "type": "include"
-          }
-        }
-      ],
-      "type": "table"
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 38,
+  "schemaVersion": 37,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -2264,13 +1531,13 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "RebootMadDevice - Stats",
   "uid": "c0292d44-7f5f-4ca9-bba8-3e52716c5005",
-  "version": 35,
+  "version": 17,
   "weekStart": "saturday"
 }
